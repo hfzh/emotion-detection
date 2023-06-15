@@ -7,7 +7,7 @@ services:
       - /dev/video0:/dev/video0
     environment:
       - PYTHONUNBUFFER=0
-      # Uncomment if want to display video
+      # Uncomment to display video
       # - DISPLAY=$DISPLAY
       - MQTT_HOSTNAME=mosquitto
     volumes:
