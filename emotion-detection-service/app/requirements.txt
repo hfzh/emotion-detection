@@ -1,6 +1,9 @@
+-i https://pypi.org/simple
+--extra-index-url https://download.pytorch.org/whl/cpu
 numpy==1.24.3
-onnxruntime==1.15.0
-onnx==1.14.0
 opencv-python==4.7.0.72
 mediapipe==0.10.1
 paho-mqtt==1.6.1
+timm==0.6.13
+torch==2.0.1+cpu
+torchvision==0.15.2+cpu

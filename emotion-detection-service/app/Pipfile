@@ -3,13 +3,19 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://download.pytorch.org/whl/cpu"
+verify_ssl = true
+name = "pytorch"
+
 [packages]
-numpy = "==1.24.3"
-onnxruntime = "==1.15.0"
-onnx = "==1.14.0"
-opencv-python = "==4.7.0.72"
-mediapipe = "==0.10.1"
-paho-mqtt = "==1.6.1"
+numpy = {version="==1.24.3"}
+opencv-python = {version="==4.7.0.72"}
+mediapipe = {version="==0.10.1"}
+paho-mqtt = {version="==1.6.1"}
+timm = {version="==0.6.13"}
+torch = {version="==2.0.1+cpu", index="pytorch"}
+torchvision = {version="==0.15.2+cpu", index="pytorch"}
 
 [dev-packages]
 
