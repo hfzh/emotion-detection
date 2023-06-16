@@ -1,9 +1,12 @@
 -i https://pypi.org/simple
 --extra-index-url https://download.pytorch.org/whl/cpu
 numpy==1.24.3
-opencv-python==4.7.0.72
-mediapipe==0.10.1
+opencv-python
+mediapipe-rpi3
 paho-mqtt==1.6.1
 timm==0.6.13
-torch==2.0.1+cpu
-torchvision==0.15.2+cpu
+# torch
+# torch==2.0.1
+# torchvision
+# torchvision==0.15.2
+# mediapipe==0.10.2
