@@ -12,7 +12,7 @@ libxext6 -y
 
 RUN pip install --upgrade pip setuptools wheel
 
-COPY ./app/requirements.txt ./requirements.txt
+COPY ./app/requirements.txt .
 
 RUN pip install -r requirements.txt
 

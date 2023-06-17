@@ -10,14 +10,14 @@ name = "pytorch"
 
 [packages]
 numpy = {version="==1.24.3"}
-opencv-python = {version="*"}
 mediapipe = {version="==0.10.1"}
 paho-mqtt = {version="==1.6.1"}
 timm = {version="==0.6.13"}
 torch = {version="==2.0.1+cpu", index="pytorch"}
 torchvision = {version="==0.15.2+cpu", index="pytorch"}
+opencv-python = "==4.7.0.72"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.8"
