@@ -63,7 +63,7 @@ test_transforms = transforms.Compose(
     ]
 )
 
-path = "./model/enet_b2_8_best.pt"
+path = "./assets/enet_b2_8_best.pt"
 model = torch.load(path, map_location = torch.device(device))
 classifier_weights = model.classifier.weight.cpu().data.numpy()
 classifier_bias = model.classifier.bias.cpu().data.numpy()
@@ -105,7 +105,7 @@ while True:
                 'emotion': emotion,
                 'time': current_time
             }
-            
+            print(res) 
             #info = client.publish(topic = "emotion", payload = json.dumps(res))
             #info.wait_for_publish()
             #print(emotion, info.is_published())
