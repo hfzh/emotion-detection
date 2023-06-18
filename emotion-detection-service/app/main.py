@@ -10,7 +10,7 @@ from torchvision import transforms
 import timm
 from PIL import Image
 
-# client = mqtt.Client(client_id='emotion-detection-service')
+# client = mqtt.Client(client_id='emotion-detection')
 # mqtt_hostname = os.environ.get('MQTT_HOSTNAME')
 # client.connect(host = mqtt_hostname, port = 1883)
 # client.loop_start()
@@ -51,7 +51,7 @@ def predict_emotions(face_img):
     scores = get_probab(features)[0]
     x = scores
     pred = np.argmax(x)
-    return idx_to_class[pred],scores
+    return idx_to_class[pred], scores
 
 idx_to_class = {0: 'Anger', 1: 'Contempt', 2: 'Disgust', 3: 'Fear', 4: 'Happiness', 5: 'Neutral', 6: 'Sadness', 7: 'Surprise'}
 
@@ -72,23 +72,30 @@ model = model.to(device)
 model = model.eval()
 print(path, test_transforms)
 
+mp_face_detection = mp.solutions.face_detection
+detector = mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
 
 previous_time = int(time.time())
-threshold = 1
+threshold = 4
 
 cap = cv2.VideoCapture(0)
+emotions = []
+
+negativity = 0;
+negative_emotions = ['Anger', 'Contempt', 'Disgust', 'Fear', 'Sadness']
+positivity = 0;
+positive_emotions = ['Happiness', 'Neutral', 'Surprise']
+
 while True:
+
     ret, frame = cap.read()
-    
+
     if not ret:
         break
 
     current_time = int(time.time())
-
     if current_time - previous_time >= threshold:
 
-        mp_face_detection = mp.solutions.face_detection
-        detector = mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
         faces = detect_face(frame)
 
         for face in faces:
@@ -99,21 +106,38 @@ while True:
             img = frame[y1:y2,x1:x2,:]
             emotion, scores = predict_emotions(img)
 
-            epoch_time = int(time.time())
-            
             res = {
                 'emotion': emotion,
                 'time': current_time
             }
-            print(res) 
-            #info = client.publish(topic = "emotion", payload = json.dumps(res))
-            #info.wait_for_publish()
-            #print(emotion, info.is_published())
-            # cv2.putText(frame, emotion, (x1, y1-20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        
+
+            #cv2.putText(frame, emotion, (x1, y1-20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            # info = client.publish(topic = "emotion", payload = json.dumps(res))
+            # info.wait_for_publish()
+            if emotion in negative_emotions:
+                negativity += 1
+                if negativity > 3: 
+                    negativity = 0
+                    positivity = -12
+                    print("GIVING SCENT AND BACKGROUND LIGHT", flush=True)
+            else:
+                if positivity < 0:
+                    positivity += 1
+                    if positivity == 0:
+                        print("RESET", flush=True)
+
+            print("-------RESULT-------", flush=True)
+            print("negative:", flush=True)
+            print(negativity, flush=True)
+            print("positivity:", flush=True)
+            print(positivity, flush=True)
+            print(emotion, flush=True)
+            print("--------------------", flush=True)
+
+
         previous_time = current_time
 
-    # cv2.imshow('Video', cv2.resize(frame,(1280,720),interpolation = cv2.INTER_CUBIC))
+    # cv2.imshow('Video', cv2.resize(frame, (640,480), interpolation = cv2.INTER_CUBIC))
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 

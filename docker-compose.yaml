@@ -2,11 +2,12 @@ version: "3"
 
 services:
   emotion-detection:
-    image: emotion-detection:latest
+    image: emotion-detection:1.0.0
     devices: 
       - /dev/video0:/dev/video0
+      - /dev/gpiomem:/dev/gpiomem
     environment:
-      - PYTHONUNBUFFER=0
+      - PYTHONUNBUFFER=1
       # Uncomment to display video
       # - DISPLAY=$DISPLAY
       - MQTT_HOSTNAME=mosquitto
@@ -14,19 +15,29 @@ services:
       # - /tmp/.X11-unix:/tmp/.X11-unix
       - ./emotion-detection-service/app:/app
     working_dir: /app
-    depends_on:
-      - mosquitto
+      #     depends_on:
+      #       - mosquitto
 
-  mosquitto:
-    image: eclipse-mosquitto
-    volumes:
-      - ./mqtt-service/config:/mosquitto/config
-      - ./mqtt-service/data:/mosquitto/data
-      - ./mqtt-service/log:/mosquitto/log
-    ports:
-      - 1883:1883
-    expose:
-      - 1883
-
-  # backend:
-  #   image: nodejs:18.16-alpine
+        #  mosquitto:
+        #    image: eclipse-mosquitto
+        #    volumes:
+        #      - ./mqtt-service/config:/mosquitto/config
+        #      - ./mqtt-service/data:/mosquitto/data
+        #      - ./mqtt-service/log:/mosquitto/log
+        #    ports:
+        #      - 1883:1883
+        #    expose:
+        #      - 1883
+        #
+        #  backend:
+        #    image: node:18.16-alpine
+        #    environment:
+        #      - MQTT_HOSTNAME=mosquitto
+        #    volumes:
+        #      - ./backend-service:/backend-service
+        #      - ./backend-service/node_modules:/backend-service/node_modules
+        #    working_dir: /backend-service
+        #    command: sh -c "npm install && npm run serve"
+        #    depends_on:
+        #      - mosquitto
+        #      - emotion-detection
