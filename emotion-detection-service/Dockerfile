@@ -4,11 +4,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y
 
-RUN apt install libgl1-mesa-glx -y
-
 RUN apt-get install ffmpeg \
 libsm6 \
-libxext6 -y
+libxext6 \
+libgl1-mesa-glx \
+gcc \
+python-dev -y
 
 RUN pip install --upgrade pip setuptools wheel
 

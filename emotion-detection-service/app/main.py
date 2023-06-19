@@ -9,6 +9,12 @@ import torch
 from torchvision import transforms
 import timm
 from PIL import Image
+import RPi.GPIO as GPIO
+from luma.core.legacy import text
+from luma.led_matrix.device import max7219
+from luma.core.interface.serial import spi, noop
+from luma.core.render import canvas
+from luma.core.legacy.font import proportional, CP437_FONT, LCD_FONT
 
 # client = mqtt.Client(client_id='emotion-detection')
 # mqtt_hostname = os.environ.get('MQTT_HOSTNAME')
@@ -19,6 +25,18 @@ device = "cpu"
 img_size = 260
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 cv2.ocl.setUseOpenCL(False)
+
+PIN_LED = 36
+PIN_RELAY = 40
+
+serial = spi(port=0, device=0, gpio=noop())
+matrix = max7219(serial, rotate=1)
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(PIN_RELAY, GPIO.OUT)
+with canvas(matrix) as draw:
+    draw.rectangle(matrix.bounding_box, fill="black")
+GPIO.output(PIN_RELAY, 1)
 
 def detect_face(frame):
     bounding_boxes = []
@@ -86,6 +104,8 @@ negative_emotions = ['Anger', 'Contempt', 'Disgust', 'Fear', 'Sadness']
 positivity = 0;
 positive_emotions = ['Happiness', 'Neutral', 'Surprise']
 
+print("Start", flush=True)
+
 while True:
 
     ret, frame = cap.read()
@@ -116,16 +136,23 @@ while True:
             # info.wait_for_publish()
             if emotion in negative_emotions:
                 negativity += 1
-                if negativity > 3: 
+                if negativity > 1: 
                     negativity = 0
-                    positivity = -12
+                    positivity = -2
                     print("GIVING SCENT AND BACKGROUND LIGHT", flush=True)
+                    with canvas(matrix) as draw:
+                        draw.rectangle(matrix.bounding_box, fill="white")
+                    GPIO.output(PIN_RELAY, 0)
+                    time.sleep(4)
+                    GPIO.output(PIN_RELAY, 1)
             else:
                 if positivity < 0:
                     positivity += 1
                     if positivity == 0:
                         print("RESET", flush=True)
-
+                        with canvas(matrix) as draw:
+                            draw.rectangle(matrix.bounding_box, fill="black")
+            
             print("-------RESULT-------", flush=True)
             print("negative:", flush=True)
             print(negativity, flush=True)
@@ -134,12 +161,15 @@ while True:
             print(emotion, flush=True)
             print("--------------------", flush=True)
 
-
         previous_time = current_time
 
     # cv2.imshow('Video', cv2.resize(frame, (640,480), interpolation = cv2.INTER_CUBIC))
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+with canvas(matrix) as draw:
+    draw.rectangle(matrix.bounding_box, fill="black")
+
 cap.release()
+GPIO.cleanup()
 cv2.destroyAllWindows()
