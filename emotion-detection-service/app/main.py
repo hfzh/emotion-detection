@@ -143,7 +143,7 @@ while True:
                     with canvas(matrix) as draw:
                         draw.rectangle(matrix.bounding_box, fill="white")
                     GPIO.output(PIN_RELAY, 0)
-                    time.sleep(4)
+                    time.sleep(2)
                     GPIO.output(PIN_RELAY, 1)
             else:
                 if positivity < 0:
